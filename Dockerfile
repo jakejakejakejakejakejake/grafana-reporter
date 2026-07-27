@@ -20,7 +20,7 @@ RUN apk add --no-cache \
     && wget -qO- "https://tinytex.yihui.org/install-bin-unix.sh" | sh -s --no-path \
     && mv ~/.TinyTeX /opt/TinyTeX \
     && /opt/TinyTeX/bin/*/tlmgr path add \
-    && /opt/TinyTeX/bin/*/tlmgr install epstopdf-pkg \
+    && /opt/TinyTeX/bin/*/tlmgr install epstopdf-pkg titling \
     && chown -R root:adm /opt/TinyTeX \
     && chmod -R g+w /opt/TinyTeX \
     && chmod -R g+wx /opt/TinyTeX/bin
