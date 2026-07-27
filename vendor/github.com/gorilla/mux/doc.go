@@ -10,18 +10,18 @@ http.ServeMux, mux.Router matches incoming requests against a list of
 registered routes and calls a handler for the route that matches the URL
 or other conditions. The main features are:
 
-	* Requests can be matched based on URL host, path, path prefix, schemes,
-	  header and query values, HTTP methods or using custom matchers.
-	* URL hosts, paths and query values can have variables with an optional
-	  regular expression.
-	* Registered URLs can be built, or "reversed", which helps maintaining
-	  references to resources.
-	* Routes can be used as subrouters: nested routes are only tested if the
-	  parent route matches. This is useful to define groups of routes that
-	  share common conditions like a host, a path prefix or other repeated
-	  attributes. As a bonus, this optimizes request matching.
-	* It implements the http.Handler interface so it is compatible with the
-	  standard http.ServeMux.
+  - Requests can be matched based on URL host, path, path prefix, schemes,
+    header and query values, HTTP methods or using custom matchers.
+  - URL hosts, paths and query values can have variables with an optional
+    regular expression.
+  - Registered URLs can be built, or "reversed", which helps maintaining
+    references to resources.
+  - Routes can be used as subrouters: nested routes are only tested if the
+    parent route matches. This is useful to define groups of routes that
+    share common conditions like a host, a path prefix or other repeated
+    attributes. As a bonus, this optimizes request matching.
+  - It implements the http.Handler interface so it is compatible with the
+    standard http.ServeMux.
 
 Let's start registering a couple of URL paths and handlers:
 
@@ -239,8 +239,7 @@ as well:
 	                                 "category", "technology",
 	                                 "id", "42")
 
-Since **vX.Y.Z**, mux supports the addition of middlewares to a [Router](https://godoc.org/github.com/gorilla/mux#Router), which are executed if a
-match is found (including subrouters). Middlewares are defined using the de facto standard type:
+Mux supports the addition of middlewares to a Router, which are executed in the order they are added if a match is found, including its subrouters. Middlewares are (typically) small pieces of code which take one request, do something with it, and pass it down to another middleware or the final handler. Some common use cases for middleware are request logging, header manipulation, or ResponseWriter hijacking.
 
 	type MiddlewareFunc func(http.Handler) http.Handler
 
@@ -261,7 +260,7 @@ Middlewares can be added to a router using `Router.Use()`:
 
 	r := mux.NewRouter()
 	r.HandleFunc("/", handler)
-	r.AddMiddleware(simpleMw)
+	r.Use(simpleMw)
 
 A more complex authentication middleware, which maps session token to users, could be written as:
 
@@ -288,7 +287,7 @@ A more complex authentication middleware, which maps session token to users, cou
 				log.Printf("Authenticated user %s\n", user)
 				next.ServeHTTP(w, r)
 			} else {
-				http.Error(w, "Forbidden", 403)
+				http.Error(w, "Forbidden", http.StatusForbidden)
 			}
 		})
 	}
@@ -296,12 +295,11 @@ A more complex authentication middleware, which maps session token to users, cou
 	r := mux.NewRouter()
 	r.HandleFunc("/", handler)
 
-	amw := authenticationMiddleware{}
+	amw := authenticationMiddleware{tokenUsers: make(map[string]string)}
 	amw.Populate()
 
 	r.Use(amw.Middleware)
 
 Note: The handler chain will be stopped if your middleware doesn't call `next.ServeHTTP()` with the corresponding parameters. This can be used to abort a request if the middleware writer wants to.
-
 */
 package mux
