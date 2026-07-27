@@ -1,5 +1,5 @@
 # build
-FROM golang:1.14.7-alpine3.12 AS build
+FROM golang:1.22-alpine3.20 AS build
 WORKDIR /go/src/${owner:-github.com/IzakMarais}/reporter
 RUN apk update && apk add make git
 ADD . .
@@ -25,6 +25,7 @@ RUN apk add --no-cache \
     && chmod -R g+w /opt/TinyTeX \
     && chmod -R g+wx /opt/TinyTeX/bin
 
+ENV PATH="/opt/TinyTeX/bin/x86_64-linuxmusl:${PATH}"
 
 COPY --from=build /go/bin/grafana-reporter /usr/local/bin
 ENTRYPOINT [ "/usr/local/bin/grafana-reporter" ]
